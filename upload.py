@@ -1,14 +1,7 @@
 import argparse
-from typing import Optional
+from pathlib import Path
 
-from youtube_uploader_selenium import YouTubeUploader
-
-
-
-def main(video_path: str, metadata_path: Optional[str] = None):
-	uploader = YouTubeUploader(video_path, metadata_path)
-	was_video_uploaded, video_id = uploader.upload()
-	assert was_video_uploaded
+from youtube_uploader_selenium import Video, YouTubeUploader
 
 
 
@@ -25,4 +18,11 @@ if __name__ == "__main__":
 	parser.add_argument("--password", help="Google Account password")
 	args = parser.parse_args()
 	
-	main(args.video, args.meta)
+	video = Video(Path(args.video), args.title, args.description, args.playlist, args.privacy)
+	uploader = YouTubeUploader()
+	
+	# if not uploader.logged_in():
+	# 	uploader.login(args.username, args.password)
+	
+	was_video_uploaded, video_id = uploader.upload(video)
+	assert was_video_uploaded
