@@ -1,5 +1,4 @@
 import argparse
-from pathlib import Path
 
 from youtube_uploader_selenium import Video, YouTubeUploader
 
@@ -18,7 +17,7 @@ if __name__ == "__main__":
 	parser.add_argument("--password", help="Google Account password")
 	args = parser.parse_args()
 	
-	video = Video(Path(args.video), args.title, args.description, args.playlist, args.privacy)
+	video = Video(args.video, args.title, args.description, args.playlist, args.privacy)
 	uploader = YouTubeUploader()
 	
 	# if not uploader.logged_in():

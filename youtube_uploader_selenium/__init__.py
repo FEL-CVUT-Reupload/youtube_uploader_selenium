@@ -2,6 +2,7 @@
     to extract its title, description etc."""
 
 import logging
+import os
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -20,7 +21,7 @@ _logger.setLevel(logging.DEBUG)
 
 @dataclass
 class Video:
-	filename: Path
+	filename: str
 	title: Optional[str] = field(default=None)
 	description: Optional[str] = field(default=None)
 	playlist: Optional[str] = field(default=None)
@@ -30,7 +31,7 @@ class Video:
 	def __post_init__(self):
 		if not self.title:
 			_logger.warning("The video title was not provided")
-			self.title = self.filename.stem
+			self.title = os.path.basename(self.filename)
 			_logger.warning(f"The video title was set to {self.title}")
 
 
@@ -76,8 +77,7 @@ class YouTubeUploader:
 		time.sleep(Constant.USER_WAITING_TIME)
 		self.browser.get(Constant.YOUTUBE_UPLOAD_URL)
 		time.sleep(Constant.USER_WAITING_TIME)
-		absolute_video_path = str(Path.cwd() / video.filename)
-		self.browser.find(By.XPATH, Constant.INPUT_FILE_VIDEO).send_keys(absolute_video_path)
+		self.browser.find(By.XPATH, Constant.INPUT_FILE_VIDEO).send_keys(os.path.abspath(video.filename))
 		_logger.debug('Attached video {}'.format(video.filename))
 		title_field = self.browser.find(By.ID, Constant.TEXTBOX, timeout=10)
 		title_field.click()
