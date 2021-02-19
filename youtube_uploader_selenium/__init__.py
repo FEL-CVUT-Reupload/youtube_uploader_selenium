@@ -56,6 +56,12 @@ class YouTubeUploader:
 			time.sleep(Constant.USER_WAITING_TIME)
 			self.browser.refresh()
 		else:
+			if None in {username, password}:
+				username = input("ČVUT username: ")
+				password = input("ČVUT password: ")
+			
+			_logger.info("Logging in...")
+			
 			# [YT] click 'login' button
 			self.browser.find(By.ID, "action-button").click()
 			time.sleep(Constant.USER_WAITING_TIME)
