@@ -41,11 +41,10 @@ class YouTubeUploader:
 	to extract its title, description etc"""
 	
 	
-	def __init__(self, channel: str) -> None:
+	def __init__(self, headless: bool, channel: str) -> None:
 		self.channel = channel
 		current_working_dir = str(Path.cwd())
-		self.browser = Firefox(current_working_dir, current_working_dir)
-	
+		self.browser = Firefox(current_working_dir, current_working_dir, headless=headless)
 	
 	
 	def login(self, username: Optional[str], password: Optional[str]):
