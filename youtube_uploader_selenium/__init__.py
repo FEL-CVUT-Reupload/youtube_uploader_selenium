@@ -55,8 +55,7 @@ class YouTubeUploader:
 			self.__quit()
 			raise
 	
-	
-	def __login(self):
+	def login(self, username: Optional[str], password: Optional[str]):
 		self.browser.get(Constant.YOUTUBE_URL)
 		time.sleep(Constant.USER_WAITING_TIME)
 		
@@ -65,8 +64,46 @@ class YouTubeUploader:
 			time.sleep(Constant.USER_WAITING_TIME)
 			self.browser.refresh()
 		else:
-			_logger.info('Please sign in and then press enter')
-			input()
+			# [YT] click 'login' button
+			self.browser.find(By.ID, "action-button").click()
+			time.sleep(Constant.USER_WAITING_TIME)
+			
+			# [G] fill in the username (email)
+			email_field = self.browser.find(By.ID, "identifierId", timeout=10)
+			email_field.click()
+			time.sleep(Constant.USER_WAITING_TIME)
+			email_field.clear()
+			time.sleep(Constant.USER_WAITING_TIME)
+			email_field.send_keys(username)
+			time.sleep(Constant.USER_WAITING_TIME)
+			
+			# [G] click 'next' button
+			self.browser.find(By.ID, "identifierNext").click()
+			time.sleep(Constant.USER_WAITING_TIME)
+			
+			# [SSO] fill in the username (email)
+			sso_username_field = self.browser.find(By.ID, "username", timeout=10)
+			sso_username_field.click()
+			time.sleep(Constant.USER_WAITING_TIME)
+			sso_username_field.clear()
+			time.sleep(Constant.USER_WAITING_TIME)
+			sso_username_field.send_keys(username.split("@")[0])
+			time.sleep(Constant.USER_WAITING_TIME)
+			
+			# [SSO] fill in the password
+			sso_password_field = self.browser.find(By.ID, "password", timeout=10)
+			sso_password_field.click()
+			time.sleep(Constant.USER_WAITING_TIME)
+			sso_password_field.clear()
+			time.sleep(Constant.USER_WAITING_TIME)
+			sso_password_field.send_keys(password)
+			time.sleep(Constant.USER_WAITING_TIME)
+			
+			# [SSO] click 'SSO login' button
+			self.browser.find(By.NAME, "_eventId_proceed").click()
+			time.sleep(Constant.USER_WAITING_TIME)
+			
+			# save cookies
 			self.browser.get(Constant.YOUTUBE_URL)
 			time.sleep(Constant.USER_WAITING_TIME)
 			self.browser.save_cookies()
