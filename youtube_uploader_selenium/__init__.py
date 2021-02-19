@@ -41,19 +41,12 @@ class YouTubeUploader:
 	to extract its title, description etc"""
 	
 	
-	def __init__(self) -> None:
+	def __init__(self, channel: str) -> None:
+		self.channel = channel
 		current_working_dir = str(Path.cwd())
 		self.browser = Firefox(current_working_dir, current_working_dir)
 	
 	
-	def upload(self, video: Video):
-		try:
-			self.__login()
-			return self.__upload(video)
-		except Exception as e:
-			print(e)
-			self.__quit()
-			raise
 	
 	def login(self, username: Optional[str], password: Optional[str]):
 		self.browser.get(Constant.YOUTUBE_URL)
@@ -109,14 +102,32 @@ class YouTubeUploader:
 			self.browser.save_cookies()
 	
 	
+	
+	def upload(self, video: Video):
+		try:
+			return self.__upload(video)
+		except Exception as e:
+			print(e)
+			self.__quit()
+			raise
+	
+	
 	def __upload(self, video: Video) -> (bool, Optional[str]):
-		self.browser.get(Constant.YOUTUBE_URL)
+		self.browser.get(f"https://studio.youtube.com/channel/{self.channel}")
 		time.sleep(Constant.USER_WAITING_TIME)
-		self.browser.get(Constant.YOUTUBE_UPLOAD_URL)
+		
+		# click 'CREATE' button
+		self.browser.find(By.ID, "create-icon").click()
 		time.sleep(Constant.USER_WAITING_TIME)
+		
+		# click 'Upload videos' button
+		self.browser.find(By.ID, "text-item-0").click()
+		time.sleep(Constant.USER_WAITING_TIME)
+		
 		self.browser.find(By.XPATH, Constant.INPUT_FILE_VIDEO).send_keys(os.path.abspath(video.filename))
 		_logger.debug('Attached video {}'.format(video.filename))
 		title_field = self.browser.find(By.ID, Constant.TEXTBOX, timeout=10)
+		time.sleep(Constant.USER_WAITING_TIME)
 		title_field.click()
 		time.sleep(Constant.USER_WAITING_TIME)
 		title_field.clear()
