@@ -201,6 +201,7 @@ class YouTubeUploader:
 		status_container = self.browser.find(By.XPATH, Constant.STATUS_CONTAINER)
 		while True:
 			in_process = status_container.text.find(Constant.UPLOADED) != -1
+			_logger.debug(status_container.text)
 			if in_process:
 				time.sleep(Constant.USER_WAITING_TIME)
 			else:
