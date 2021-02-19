@@ -144,6 +144,42 @@ class YouTubeUploader:
 			_logger.debug('The video description was set to \"{}\"'.format(video.description))
 			time.sleep(Constant.USER_WAITING_TIME)
 		
+		if video.playlist:
+			self.browser.find(By.CLASS_NAME, "dropdown").click()
+			time.sleep(Constant.USER_WAITING_TIME)
+			playlists = self.browser.find_all(By.CSS_SELECTOR, "label.style-scope.ytcp-checkbox-group.ytcp-checkbox-label")
+			
+			for playlist in playlists:
+				playlist_name = self.browser.find(By.CSS_SELECTOR, "span.label.label-text", playlist).text
+				if video.playlist == playlist_name:
+					# click the checkbox
+					self.browser.find(By.CSS_SELECTOR, "ytcp-checkbox-lit.ytcp-checkbox-group", playlist).click()
+					time.sleep(Constant.USER_WAITING_TIME)
+					break
+			else:  # create a new playlist
+				self.browser.find(By.CLASS_NAME, "new-playlist-button").click()
+				time.sleep(Constant.USER_WAITING_TIME)
+				
+				create_playlist_form = self.browser.find(By.ID, "create-playlist-form")
+				textarea = self.browser.find(By.TAG_NAME, "textarea", element=create_playlist_form)
+				textarea.click()
+				textarea.clear()
+				textarea.send_keys(video.playlist)
+				time.sleep(Constant.USER_WAITING_TIME)
+				
+				self.browser.find(By.CLASS_NAME, "visibility", element=create_playlist_form).click()
+				time.sleep(Constant.USER_WAITING_TIME)
+				
+				print(video.privacy.upper())
+				self.browser.find(By.CLASS_NAME, f'paper-item[test-id="{video.privacy.upper()}"]', element=create_playlist_form).click()
+				time.sleep(Constant.USER_WAITING_TIME)
+				
+				self.browser.find(By.CLASS_NAME, "create-playlist-button").click()
+				time.sleep(Constant.USER_WAITING_TIME)
+			
+			self.browser.find(By.CLASS_NAME, "done-button").click()
+			time.sleep(Constant.USER_WAITING_TIME)
+		
 		kids_section = self.browser.find(By.NAME, Constant.NOT_MADE_FOR_KIDS_LABEL)
 		self.browser.find(By.ID, Constant.RADIO_LABEL, kids_section).click()
 		_logger.debug('Selected \"{}\"'.format(Constant.NOT_MADE_FOR_KIDS_LABEL))
