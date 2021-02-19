@@ -3,7 +3,6 @@ import argparse
 from youtube_uploader_selenium import Video, YouTubeUploader
 
 
-
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--video", required=True, help="path to the video file")
@@ -18,10 +17,9 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 	
 	video = Video(args.video, args.title, args.description, args.playlist, args.privacy)
-	uploader = YouTubeUploader()
-	
-	# if not uploader.logged_in():
-	# 	uploader.login(args.username, args.password)
-	
+	uploader = YouTubeUploader(args.headless, args.channel)
+	uploader.login(args.username, args.password)
 	was_video_uploaded, video_id = uploader.upload(video)
 	assert was_video_uploaded
+	
+	print(f"YouTube link: https://youtu.be/{video_id}")
