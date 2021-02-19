@@ -29,6 +29,7 @@ class Video:
 	
 	
 	def __post_init__(self):
+		assert self.privacy in {None, "public", "unlisted", "private"}
 		if not self.title:
 			_logger.warning("The video title was not provided")
 			self.title = os.path.basename(self.filename)
@@ -153,9 +154,11 @@ class YouTubeUploader:
 		self.browser.find(By.ID, Constant.NEXT_BUTTON).click()
 		_logger.debug('Clicked another {}'.format(Constant.NEXT_BUTTON))
 		
-		public_main_button = self.browser.find(By.NAME, Constant.PUBLIC_BUTTON)
-		self.browser.find(By.ID, Constant.RADIO_LABEL, public_main_button).click()
-		_logger.debug('Made the video {}'.format(Constant.PUBLIC_BUTTON))
+		if video.privacy:
+			privacy_button_name = dict(private=Constant.PRIVATE_BUTTON, unlisted=Constant.UNLISTED_BUTTON, public=Constant.PUBLIC_BUTTON)[video.privacy]
+			privacy_button = self.browser.find(By.NAME, privacy_button_name)
+			self.browser.find(By.ID, Constant.RADIO_LABEL, privacy_button).click()
+			_logger.debug('Made the video {}'.format(Constant.PUBLIC_BUTTON))
 		
 		video_id = self.__get_video_id()
 		

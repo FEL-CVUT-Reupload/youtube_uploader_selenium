@@ -17,6 +17,8 @@ class Constant:
 	                   'div/div[1]/ytcp-video-upload-progress/span'
 	NOT_MADE_FOR_KIDS_LABEL = 'NOT_MADE_FOR_KIDS'
 	NEXT_BUTTON = 'next-button'
+	PRIVATE_BUTTON = 'PRIVATE'
+	UNLISTED_BUTTON = 'UNLISTED'
 	PUBLIC_BUTTON = 'PUBLIC'
 	VIDEO_URL_CONTAINER = "//span[@class='video-url-fadeable style-scope ytcp-video-info']"
 	VIDEO_URL_ELEMENT = "//a[@class='style-scope ytcp-video-info']"

@@ -10,7 +10,7 @@ if __name__ == "__main__":
 	parser.add_argument("--title")
 	parser.add_argument("--description")
 	parser.add_argument("--playlist")
-	parser.add_argument("--privacy", choices=["public", "unlisted", "private"], default="private")
+	parser.add_argument("--privacy", choices=["public", "unlisted", "private"])
 	parser.add_argument("--headless", dest="headless", action="store_true", help="log in without browser interaction")
 	parser.add_argument("--username", help="ČVUT username")
 	parser.add_argument("--password", help="ČVUT password")
