@@ -57,7 +57,7 @@ class YouTubeUploader:
 			time.sleep(Constant.USER_WAITING_TIME)
 			self.browser.refresh()
 		else:
-			if None in {username, password}:
+			if None in {username, password} or "" in {username, password}:
 				username = input("ČVUT username: ")
 				password = input("ČVUT password: ")
 			
