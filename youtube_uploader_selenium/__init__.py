@@ -191,10 +191,9 @@ class YouTubeUploader:
 		_logger.debug('Clicked another {}'.format(Constant.NEXT_BUTTON))
 		
 		if video.privacy:
-			privacy_button_name = dict(private=Constant.PRIVATE_BUTTON, unlisted=Constant.UNLISTED_BUTTON, public=Constant.PUBLIC_BUTTON)[video.privacy]
-			privacy_button = self.browser.find(By.NAME, privacy_button_name)
+			privacy_button = self.browser.find(By.NAME, video.privacy.upper())
 			self.browser.find(By.ID, Constant.RADIO_LABEL, privacy_button).click()
-			_logger.debug('Made the video {}'.format(Constant.PUBLIC_BUTTON))
+			_logger.debug('Made the video {}'.format(video.privacy.upper()))
 		
 		video_id = self.__get_video_id()
 		
