@@ -136,8 +136,7 @@ class YouTubeUploader:
 		time.sleep(Constant.USER_WAITING_TIME)
 		
 		if video.description:
-			description_container = self.browser.find(By.XPATH, Constant.DESCRIPTION_CONTAINER)
-			description_field = self.browser.find(By.ID, Constant.TEXTBOX, element=description_container)
+			description_field = self.browser.find(By.XPATH, Constant.DESCRIPTION_CONTAINER)
 			description_field.click()
 			description_field.clear()
 			description_field.send_keys(video.description)
@@ -197,7 +196,9 @@ class YouTubeUploader:
 		
 		video_id = self.__get_video_id()
 		
-		status_container = self.browser.find(By.XPATH, Constant.STATUS_CONTAINER)
+		time.sleep(Constant.USER_WAITING_TIME)
+		status_container = self.browser.find(By.CLASS_NAME, "progress-label")
+		
 		while True:
 			in_process = status_container.text.find(Constant.UPLOADED) != -1
 			_logger.debug(status_container.text)
