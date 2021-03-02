@@ -201,10 +201,11 @@ class YouTubeUploader:
 		
 		while True:
 			in_process = status_container.text.find(Constant.UPLOADED) != -1
-			_logger.debug(status_container.text)
+			print("     \r", status_container.text.strip(), end="")
 			if in_process:
 				time.sleep(Constant.USER_WAITING_TIME)
 			else:
+				print()
 				break
 		
 		time.sleep(Constant.USER_WAITING_TIME)
