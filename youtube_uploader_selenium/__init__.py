@@ -82,6 +82,7 @@ class YouTubeUploader:
 			sso_username_field = self.browser.find(By.ID, "username", timeout=10)
 			sso_username_field.click()
 			sso_username_field.clear()
+			time.sleep(Constant.USER_WAITING_TIME)
 			sso_username_field.send_keys(username)
 			time.sleep(Constant.USER_WAITING_TIME)
 			
@@ -89,6 +90,7 @@ class YouTubeUploader:
 			sso_password_field = self.browser.find(By.ID, "password", timeout=10)
 			sso_password_field.click()
 			sso_password_field.clear()
+			time.sleep(Constant.USER_WAITING_TIME)
 			sso_password_field.send_keys(password)
 			time.sleep(Constant.USER_WAITING_TIME)
 			
@@ -200,9 +202,10 @@ class YouTubeUploader:
 		status_container = self.browser.find(By.CLASS_NAME, "progress-label")
 		
 		while True:
-			in_process = status_container.text.find(Constant.UPLOADED) != -1
-			print("     \r", status_container.text.strip(), end="")
-			if in_process:
+			in_process1 = status_container.text.find("Uploading") != -1
+			in_process2 = status_container.text.find("Nahráno") != -1
+			print("\r", status_container.text.strip(), end="")
+			if in_process1 or in_process2:
 				time.sleep(Constant.USER_WAITING_TIME)
 			else:
 				print()
