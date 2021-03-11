@@ -20,6 +20,5 @@ class Constant:
 	VIDEO_URL_ELEMENT = "//a[@class='style-scope ytcp-video-info']"
 	HREF = 'href'
 	ERROR_CONTAINER = '//*[@id="error-message"]'
-	VIDEO_NOT_FOUND_ERROR = 'Could not find video_id'
 	DONE_BUTTON = 'done-button'
 	INPUT_FILE_VIDEO = "//input[@type='file']"

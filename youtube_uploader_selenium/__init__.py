@@ -1,7 +1,6 @@
 """This module implements uploading videos on YouTube via Selenium using metadata JSON file
     to extract its title, description etc."""
 
-import logging
 import os
 import time
 from dataclasses import dataclass, field
@@ -11,11 +10,6 @@ from typing import Optional
 from selenium_firefox.firefox import By, Firefox, Keys
 
 from .Constant import *
-
-logging.basicConfig()
-
-_logger = logging.getLogger(__name__)
-_logger.setLevel(logging.DEBUG)
 
 
 
@@ -31,9 +25,9 @@ class Video:
 	def __post_init__(self):
 		assert self.privacy in {None, "public", "unlisted", "private"}
 		if not self.title:
-			_logger.warning("The video title was not provided")
+			print("WARNING: The video title was not provided")
 			self.title = os.path.basename(self.filename)
-			_logger.warning(f"The video title was set to {self.title}")
+			print(f"The video title was set to {self.title}")
 
 
 
@@ -65,7 +59,7 @@ class YouTubeUploader:
 			return True
 		
 		# [G] fill in the username (email)
-		print(f"Send Keys: username ({username}@fel.cvut.cz)")
+		print(f"Sending keys: email: '{username}@fel.cvut.cz'")
 		email_field = self.browser.find(By.ID, "identifierId")
 		email_field.click()
 		email_field.clear()
@@ -80,14 +74,14 @@ class YouTubeUploader:
 			return False
 		
 		# [SSO] fill in the username
-		print(f"Send Keys: SSO username")
+		print(f"Sending keys: SSO username: '{username}'")
 		sso_username_field = self.browser.find(By.ID, "username")
 		sso_username_field.click()
 		sso_username_field.clear()
 		sso_username_field.send_keys(username)
 		
 		# [SSO] fill in the password
-		print(f"Send Keys: SSO password")
+		print(f"Sending keys: SSO password: '<hidden>'")
 		sso_password_field = self.browser.find(By.ID, "password")
 		sso_password_field.click()
 		sso_password_field.clear()
@@ -124,108 +118,104 @@ class YouTubeUploader:
 			return self.__upload(video)
 		except Exception as e:
 			print(e)
-			self.__quit()
+			self.browser.driver.quit()
 			raise
 	
 	
 	def __upload(self, video: Video) -> (bool, Optional[str]):
 		self.browser.get(f"https://studio.youtube.com/channel/{self.channel}")
-		time.sleep(Constant.USER_WAITING_TIME)
 		
-		# click 'CREATE' button
-		self.browser.find(By.ID, "create-icon").click()
-		time.sleep(Constant.USER_WAITING_TIME)
+		print("Click: upload")
+		self.browser.find(By.ID, "upload-icon").click()
 		
-		# click 'Upload videos' button
-		self.browser.find(By.ID, "text-item-0").click()
-		time.sleep(Constant.USER_WAITING_TIME)
-		
+		print(f"Attaching video: '{video.filename}'")
 		self.browser.find(By.XPATH, Constant.INPUT_FILE_VIDEO).send_keys(os.path.abspath(video.filename))
-		_logger.debug('Attached video {}'.format(video.filename))
 		
-		title_field = self.browser.find(By.ID, Constant.TEXTBOX, timeout=20)
-		time.sleep(Constant.USER_WAITING_TIME * 3)
+		print(f"Sending keys: video title: '{video.title}'")
+		title_field = self.browser.find(By.ID, Constant.TEXTBOX, timeout=30)
 		title_field.click()
 		title_field.clear()
 		title_field.send_keys(Keys.CONTROL + 'a')
 		title_field.send_keys(video.title)
-		_logger.debug('The video title was set to \"{}\"'.format(video.title))
-		time.sleep(Constant.USER_WAITING_TIME)
 		
 		if video.description:
+			print(f"Sending keys: video description: '{video.description}'")
 			description_field = self.browser.find(By.XPATH, Constant.DESCRIPTION_CONTAINER)
 			description_field.click()
 			description_field.clear()
 			description_field.send_keys(video.description)
-			_logger.debug('The video description was set to \"{}\"'.format(video.description))
-			time.sleep(Constant.USER_WAITING_TIME)
 		
 		if video.playlist:
+			print("Click: playlist dropdown")
 			self.browser.find(By.CLASS_NAME, "dropdown").click()
-			time.sleep(Constant.USER_WAITING_TIME)
+			
+			# TODO: playlist ID
+			print("Selecting the playlist")
 			playlists = self.browser.find_all(By.CSS_SELECTOR, "label.style-scope.ytcp-checkbox-group.ytcp-checkbox-label")
 			
 			for playlist in playlists:
 				playlist_name = self.browser.find(By.CSS_SELECTOR, "span.label.label-text", playlist).text
 				if video.playlist == playlist_name:
-					# click the checkbox
+					print("Click: playlist checkbox")
 					self.browser.find(By.CSS_SELECTOR, "ytcp-checkbox-lit.ytcp-checkbox-group", playlist).click()
-					time.sleep(Constant.USER_WAITING_TIME)
 					break
 			else:  # create a new playlist
+				print("Playlist not found in the list, creating a new one")
 				self.browser.find(By.CLASS_NAME, "new-playlist-button").click()
-				time.sleep(Constant.USER_WAITING_TIME)
 				
 				create_playlist_form = self.browser.find(By.ID, "create-playlist-form")
+				
+				print(f"Sending keys: playlist name: '{video.playlist}'")
 				textarea = self.browser.find(By.TAG_NAME, "textarea", element=create_playlist_form)
 				textarea.click()
 				textarea.clear()
 				textarea.send_keys(video.playlist)
-				time.sleep(Constant.USER_WAITING_TIME)
 				
+				print("Click: visibility dropdown")
 				self.browser.find(By.CLASS_NAME, "visibility", element=create_playlist_form).click()
-				time.sleep(Constant.USER_WAITING_TIME)
 				
-				print(video.privacy.upper())
+				print(f"Click: visibility: '{video.privacy.upper()}'")
 				self.browser.find(By.CLASS_NAME, f'paper-item[test-id="{video.privacy.upper()}"]', element=create_playlist_form).click()
-				time.sleep(Constant.USER_WAITING_TIME)
 				
+				print("Click: create playlist")
 				self.browser.find(By.CLASS_NAME, "create-playlist-button").click()
-				time.sleep(Constant.USER_WAITING_TIME)
 			
-			self.browser.find(By.CLASS_NAME, "done-button").click()
+			print("Click: done")
 			time.sleep(Constant.USER_WAITING_TIME)
+			self.browser.find(By.CLASS_NAME, "done-button").click()
 		
+		print("Click: not made for kids")
 		kids_section = self.browser.find(By.NAME, Constant.NOT_MADE_FOR_KIDS_LABEL)
 		self.browser.find(By.ID, Constant.RADIO_LABEL, kids_section).click()
-		_logger.debug('Selected \"{}\"'.format(Constant.NOT_MADE_FOR_KIDS_LABEL))
 		
+		print("Click: next")
 		self.browser.find(By.ID, Constant.NEXT_BUTTON).click()
-		_logger.debug('Clicked {}'.format(Constant.NEXT_BUTTON))
 		
+		print("Click: next")
 		self.browser.find(By.ID, Constant.NEXT_BUTTON).click()
-		_logger.debug('Clicked another {}'.format(Constant.NEXT_BUTTON))
 		
 		if video.privacy:
+			print(f"Click: visibility: '{video.privacy.upper()}'")
 			privacy_button = self.browser.find(By.NAME, video.privacy.upper())
 			self.browser.find(By.ID, Constant.RADIO_LABEL, privacy_button).click()
-			_logger.debug('Made the video {}'.format(video.privacy.upper()))
-		
-		video_id = self.__get_video_id()
 		
 		time.sleep(Constant.USER_WAITING_TIME)
+		video_id = self.__get_video_id()
+		print(f"Video link: https://youtu.be/{video_id}")
+		
 		status_container = self.browser.find(By.CLASS_NAME, "progress-label")
 		
 		while True:
 			in_process1 = status_container.text.find("Uploading") != -1
 			in_process2 = status_container.text.find("Nahráno") != -1
-			print("\r", status_container.text.strip(), end="")
+			print(f"\r{status_container.text}\033[K", end="")
 			if in_process1 or in_process2:
-				time.sleep(Constant.USER_WAITING_TIME)
+				time.sleep(0.5)
 			else:
 				print()
 				break
 		
+		print("Click: done")
 		time.sleep(Constant.USER_WAITING_TIME)
 		done_button = self.browser.find(By.ID, Constant.DONE_BUTTON)
 		
@@ -233,28 +223,23 @@ class YouTubeUploader:
 		# "File is a duplicate of a video you have already uploaded"
 		if done_button.get_attribute('aria-disabled') == 'true':
 			error_message = self.browser.find(By.XPATH, Constant.ERROR_CONTAINER).text
-			_logger.error(error_message)
+			print(f"Upload ERROR: {error_message}")
 			return False, None
 		
 		done_button.click()
-		_logger.debug("Published the video with video_id = {}".format(video_id))
-		time.sleep(Constant.USER_WAITING_TIME)
 		self.browser.get(Constant.YOUTUBE_URL)
-		self.__quit()
+		self.browser.driver.quit()
 		return True, video_id
 	
 	
 	def __get_video_id(self) -> Optional[str]:
 		video_id = None
+		
 		try:
 			video_url_container = self.browser.find(By.XPATH, Constant.VIDEO_URL_CONTAINER)
 			video_url_element = self.browser.find(By.XPATH, Constant.VIDEO_URL_ELEMENT, element=video_url_container)
 			video_id = video_url_element.get_attribute(Constant.HREF).split('/')[-1]
 		except:
-			_logger.warning(Constant.VIDEO_NOT_FOUND_ERROR)
-			pass
+			print(f"ERROR: could not find video_id")
+		
 		return video_id
-	
-	
-	def __quit(self):
-		self.browser.driver.quit()
