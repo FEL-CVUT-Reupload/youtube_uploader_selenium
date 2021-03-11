@@ -48,60 +48,78 @@ class YouTubeUploader:
 		self.browser = Firefox(current_working_dir, current_working_dir, headless=headless)
 	
 	
-	def login(self, username: Optional[str], password: Optional[str]):
+	
+	def login(self, username: Optional[str], password: Optional[str]) -> bool:
 		self.browser.get(Constant.YOUTUBE_URL)
-		time.sleep(Constant.USER_WAITING_TIME * 2)
 		
 		if self.browser.has_cookies_for_current_website():
+			print("Loading cookies")
 			self.browser.load_cookies()
-			time.sleep(Constant.USER_WAITING_TIME)
-			self.browser.refresh()
-		else:
-			if None in {username, password} or "" in {username, password}:
-				username = input("ČVUT username: ")
-				password = input("ČVUT password: ")
-			
-			_logger.info("Logging in...")
-			
-			# [YT] click 'login' button
-			self.browser.find(By.ID, "action-button").click()
-			time.sleep(Constant.USER_WAITING_TIME)
-			
-			# [G] fill in the username (email)
-			email_field = self.browser.find(By.ID, "identifierId", timeout=10)
-			email_field.click()
-			email_field.clear()
-			email_field.send_keys(f"{username}@fel.cvut.cz")
-			time.sleep(Constant.USER_WAITING_TIME)
-			
-			# [G] click 'next' button
-			self.browser.find(By.ID, "identifierNext").click()
-			time.sleep(Constant.USER_WAITING_TIME)
-			
-			# [SSO] fill in the username
-			sso_username_field = self.browser.find(By.ID, "username", timeout=10)
-			sso_username_field.click()
-			sso_username_field.clear()
-			time.sleep(Constant.USER_WAITING_TIME)
-			sso_username_field.send_keys(username)
-			time.sleep(Constant.USER_WAITING_TIME)
-			
-			# [SSO] fill in the password
-			sso_password_field = self.browser.find(By.ID, "password", timeout=10)
-			sso_password_field.click()
-			sso_password_field.clear()
-			time.sleep(Constant.USER_WAITING_TIME)
-			sso_password_field.send_keys(password)
-			time.sleep(Constant.USER_WAITING_TIME)
-			
-			# [SSO] click 'SSO login' button
-			self.browser.find(By.NAME, "_eventId_proceed").click()
-			time.sleep(Constant.USER_WAITING_TIME * 5)
-			
-			# save cookies
-			self.browser.get(Constant.YOUTUBE_URL)
-			time.sleep(Constant.USER_WAITING_TIME)
-			self.browser.save_cookies()
+		
+		YOUTUBE_STUDIO_URL = f"https://studio.youtube.com/channel/{self.channel}"
+		self.browser.get(YOUTUBE_STUDIO_URL)
+		
+		if self.browser.driver.current_url == YOUTUBE_STUDIO_URL:
+			print("Logged in!")
+			return True
+		
+		if None in {username, password} or "" in {username, password}:
+			username = input("ČVUT username: ")
+			password = input("ČVUT password: ")
+		
+		# [G] fill in the username (email)
+		print(f"Send Keys: username ({username}@fel.cvut.cz)")
+		email_field = self.browser.find(By.ID, "identifierId")
+		email_field.click()
+		email_field.clear()
+		email_field.send_keys(f"{username}@fel.cvut.cz")
+		
+		# [G] click 'next' button
+		print("Click: next")
+		self.browser.find(By.ID, "identifierNext").click()
+		
+		if self.browser.find(By.XPATH, Constant.G_LOGIN_FAILED, timeout=2) is not None:
+			print("Invalid username!")
+			return False
+		
+		# [SSO] fill in the username
+		print(f"Send Keys: SSO username")
+		sso_username_field = self.browser.find(By.ID, "username")
+		sso_username_field.click()
+		sso_username_field.clear()
+		sso_username_field.send_keys(username)
+		
+		# [SSO] fill in the password
+		print(f"Send Keys: SSO password")
+		sso_password_field = self.browser.find(By.ID, "password")
+		sso_password_field.click()
+		sso_password_field.clear()
+		sso_password_field.send_keys(password)
+		
+		# [SSO] click 'SSO login' button
+		print("Click: SSO login")
+		self.browser.find(By.NAME, "_eventId_proceed").click()
+		
+		if self.browser.find(By.CLASS_NAME, "error-message", timeout=2) is not None:
+			print("Invalid username or password!")
+			return False
+		
+		print("Waiting for Google login...")
+		if self.browser.find(By.ID, "upload-icon", timeout=20) is None:
+			print("Login timeout!")
+			return False
+		
+		if self.browser.driver.current_url != YOUTUBE_STUDIO_URL:
+			print("Login failed!")
+			return False
+		
+		# save cookies
+		print("Saving cookies")
+		self.browser.save_cookies()
+		
+		print("Logged in!")
+		return True
+	
 	
 	
 	def upload(self, video: Video):

@@ -1,12 +1,13 @@
 class Constant:
 	"""A class for storing constants for YoutubeUploader class"""
-	YOUTUBE_URL = 'https://www.youtube.com'
+	YOUTUBE_URL = "https://www.youtube.com/feed/library"
 	YOUTUBE_STUDIO_URL = 'https://studio.youtube.com'
 	YOUTUBE_UPLOAD_URL = 'https://www.youtube.com/upload'
 	USER_WAITING_TIME = 1
 	VIDEO_TITLE = 'title'
 	VIDEO_DESCRIPTION = 'description'
 	DESCRIPTION_CONTAINER = '/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-uploads-details/div/ytcp-uploads-basics/ytcp-mention-textbox[2]/ytcp-form-input-container/div[1]/div[2]/ytcp-mention-input/div'
+	G_LOGIN_FAILED = "/html/body/div[1]/div[1]/div[2]/div/div[2]/div/div/div[2]/div/div[1]/div/form/span/section/div/div/div[1]/div/div[2]/div[2]/div"
 	TEXTBOX = 'textbox'
 	TEXT_INPUT = 'text-input'
 	RADIO_LABEL = 'radioLabel'
