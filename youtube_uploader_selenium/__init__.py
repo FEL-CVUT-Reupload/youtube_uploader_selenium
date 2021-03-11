@@ -5,6 +5,7 @@ import logging
 import os
 import time
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Optional
 
 from selenium_firefox.firefox import By, Firefox, Keys
@@ -43,6 +44,8 @@ class YouTubeUploader:
 	
 	def __init__(self, headless: bool, cookies_path: str, channel: str) -> None:
 		self.channel = channel
+		cookies_path = str(Path(cookies_path)) if cookies_path else str(Path.cwd())
+		assert os.path.isdir(cookies_path), f"Directory '{cookies_path}' does not exist!"
 		self.browser = Firefox(cookies_path, cookies_path, headless=headless)
 	
 	
