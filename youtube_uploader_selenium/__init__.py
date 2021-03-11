@@ -63,10 +63,6 @@ class YouTubeUploader:
 			print("Logged in!")
 			return True
 		
-		if None in {username, password} or "" in {username, password}:
-			username = input("ČVUT username: ")
-			password = input("ČVUT password: ")
-		
 		# [G] fill in the username (email)
 		print(f"Send Keys: username ({username}@fel.cvut.cz)")
 		email_field = self.browser.find(By.ID, "identifierId")
