@@ -5,7 +5,6 @@ import logging
 import os
 import time
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Optional
 
 from selenium_firefox.firefox import By, Firefox, Keys
@@ -42,10 +41,9 @@ class YouTubeUploader:
 	to extract its title, description etc"""
 	
 	
-	def __init__(self, headless: bool, channel: str) -> None:
+	def __init__(self, headless: bool, cookies_path: str, channel: str) -> None:
 		self.channel = channel
-		current_working_dir = str(Path.cwd())
-		self.browser = Firefox(current_working_dir, current_working_dir, headless=headless)
+		self.browser = Firefox(cookies_path, cookies_path, headless=headless)
 	
 	
 	

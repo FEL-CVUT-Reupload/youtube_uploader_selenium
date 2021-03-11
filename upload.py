@@ -14,10 +14,11 @@ if __name__ == "__main__":
 	parser.add_argument("--headless", dest="headless", action="store_true", help="log in without browser interaction")
 	parser.add_argument("--username", help="ČVUT username")
 	parser.add_argument("--password", help="ČVUT password")
+	parser.add_argument("--cookies", help="path to the directory where cookies should be saved")
 	args = parser.parse_args()
 	
 	video = Video(args.video, args.title, args.description, args.playlist, args.privacy)
-	uploader = YouTubeUploader(args.headless, args.channel)
+	uploader = YouTubeUploader(args.headless, args.cookies, args.channel)
 	
 	while not (success := uploader.login(args.username, args.password)):
 		args.username = input("ČVUT username: ")
