@@ -20,11 +20,9 @@ if __name__ == "__main__":
 	video = Video(args.video, args.title, args.description, args.playlist, args.privacy)
 	uploader = YouTubeUploader(args.headless, args.cookies, args.channel)
 	
-	while not (success := uploader.login(args.username, args.password)):
+	while not (login_success := uploader.login(args.username, args.password)):
 		args.username = input("ČVUT username: ")
 		args.password = input("ČVUT password: ")
 	
-	was_video_uploaded, video_id = uploader.upload(video)
-	assert was_video_uploaded
-	
-	print(f"YouTube link: https://youtu.be/{video_id}")
+	upload_success, video_id = uploader.upload(video)
+	assert upload_success

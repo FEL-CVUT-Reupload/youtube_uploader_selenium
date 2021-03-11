@@ -13,7 +13,7 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 	
 	uploader = YouTubeUploader(args.headless, args.cookies, args.channel)
-	success = uploader.login(args.username, args.password)
+	login_success = uploader.login(args.username, args.password)
 	
-	if not success:
+	if not login_success:
 		exit(7)
