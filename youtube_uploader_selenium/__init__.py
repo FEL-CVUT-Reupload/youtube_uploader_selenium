@@ -156,7 +156,7 @@ class YouTubeUploader:
 			for playlist in playlists:
 				playlist_name = self.browser.find(By.CSS_SELECTOR, "span.label.label-text", playlist).text
 				if video.playlist == playlist_name:
-					print("Click: playlist checkbox")
+					print(f"Click: playlist checkbox: '{playlist_name}'")
 					self.browser.find(By.CSS_SELECTOR, "ytcp-checkbox-lit.ytcp-checkbox-group", playlist).click()
 					break
 			else:  # create a new playlist
