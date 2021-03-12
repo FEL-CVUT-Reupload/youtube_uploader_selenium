@@ -43,6 +43,13 @@ class YouTubeUploader:
 		self.browser = Firefox(cookies_path, cookies_path, headless=headless)
 	
 	
+	def __enter__(self):
+		return self
+	
+	
+	def __exit__(self, exc_type, exc_val, exc_tb):
+		self.browser.driver.quit()
+	
 	
 	def login(self, username: Optional[str], password: Optional[str]) -> bool:
 		self.browser.get(Constant.YOUTUBE_URL)
@@ -117,16 +124,7 @@ class YouTubeUploader:
 	
 	
 	
-	def upload(self, video: Video):
-		try:
-			return self.__upload(video)
-		except Exception as e:
-			print(e)
-			self.browser.driver.quit()
-			raise
-	
-	
-	def __upload(self, video: Video) -> (bool, Optional[str]):
+	def upload(self, video: Video) -> (bool, Optional[str]):
 		self.browser.get(f"https://studio.youtube.com/channel/{self.channel}")
 		
 		print("Click: upload")
@@ -232,7 +230,6 @@ class YouTubeUploader:
 		
 		done_button.click()
 		self.browser.get(Constant.YOUTUBE_URL)
-		self.browser.driver.quit()
 		return True, video_id
 	
 	

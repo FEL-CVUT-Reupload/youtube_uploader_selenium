@@ -12,8 +12,8 @@ if __name__ == "__main__":
 	parser.add_argument("--cookies", help="path to the directory where cookies should be saved")
 	args = parser.parse_args()
 	
-	uploader = YouTubeUploader(args.headless, args.cookies, args.channel)
-	login_success = uploader.login(args.username, args.password)
+	with YouTubeUploader(args.headless, args.cookies, args.channel) as uploader:
+		login_success = uploader.login(args.username, args.password)
 	
 	if not login_success:
 		exit(7)

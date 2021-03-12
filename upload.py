@@ -18,11 +18,12 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 	
 	video = Video(args.video, args.title, args.description, args.playlist, args.privacy)
-	uploader = YouTubeUploader(args.headless, args.cookies, args.channel)
 	
-	while not (login_success := uploader.login(args.username, args.password)):
-		args.username = input("ČVUT username: ")
-		args.password = input("ČVUT password: ")
+	with YouTubeUploader(args.headless, args.cookies, args.channel) as uploader:
+		while not (login_success := uploader.login(args.username, args.password)):
+			args.username = input("ČVUT username: ")
+			args.password = input("ČVUT password: ")
+		
+		upload_success, video_id = uploader.upload(video)
 	
-	upload_success, video_id = uploader.upload(video)
 	assert upload_success
