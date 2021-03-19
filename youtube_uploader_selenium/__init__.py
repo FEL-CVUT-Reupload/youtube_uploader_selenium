@@ -133,13 +133,6 @@ class YouTubeUploader:
 		print(f"Attaching video: '{video.filename}'")
 		self.browser.find(By.XPATH, Constant.INPUT_FILE_VIDEO).send_keys(os.path.abspath(video.filename))
 		
-		print(f"Sending keys: video title: '{video.title}'")
-		title_field = self.browser.find(By.ID, Constant.TEXTBOX, timeout=30)
-		title_field.click()
-		title_field.clear()
-		title_field.send_keys(Keys.CONTROL + 'a')
-		title_field.send_keys(video.title)
-		
 		if video.description:
 			print(f"Sending keys: video description: '{video.description}'")
 			description_field = self.browser.find(By.XPATH, Constant.DESCRIPTION_CONTAINER)
@@ -190,6 +183,13 @@ class YouTubeUploader:
 		kids_section = self.browser.find(By.NAME, Constant.NOT_MADE_FOR_KIDS_LABEL)
 		self.browser.find(By.ID, Constant.RADIO_LABEL, kids_section).click()
 		
+		print(f"Sending keys: video title: '{video.title}'")
+		title_field = self.browser.find(By.ID, Constant.TEXTBOX, timeout=30)
+		title_field.click()
+		title_field.clear()
+		title_field.send_keys(Keys.CONTROL + 'a')
+		title_field.send_keys(video.title)
+		
 		print("Click: next")
 		self.browser.find(By.ID, Constant.NEXT_BUTTON).click()
 		
@@ -205,20 +205,19 @@ class YouTubeUploader:
 		video_id = self.__get_video_id()
 		print(f"Video link: https://youtu.be/{video_id}")
 		
-		status_container = self.browser.find(By.CLASS_NAME, "progress-label")
+		container = self.browser.find(By.CSS_SELECTOR, ".left-button-area.style-scope.ytcp-uploads-dialog")
 		
 		while True:
-			in_process1 = status_container.text.find("Uploading") != -1
-			in_process2 = status_container.text.find("Nahráno") != -1
-			print(f"\r{status_container.text}\033[K", end="")
-			if in_process1 or in_process2:
-				time.sleep(0.5)
-			else:
+			texts = [a.text for a in self.browser.find_all(By.CLASS_NAME, "progress-label", container)]
+			print(f'\r{texts[-1]}\033[K', end="")
+			if any(substring in element for substring in {"complete", "dokončeno"} for element in texts):
 				print()
+				time.sleep(Constant.USER_WAITING_TIME)
 				break
+			else:
+				time.sleep(0.5)
 		
 		print("Click: done")
-		time.sleep(Constant.USER_WAITING_TIME)
 		done_button = self.browser.find(By.ID, Constant.DONE_BUTTON)
 		
 		# Catch such error as
