@@ -190,11 +190,9 @@ class YouTubeUploader:
 		title_field.send_keys(Keys.CONTROL + 'a')
 		title_field.send_keys(video.title)
 		
-		print("Click: next")
-		self.browser.find(By.ID, Constant.NEXT_BUTTON).click()
-		
-		print("Click: next")
-		self.browser.find(By.ID, Constant.NEXT_BUTTON).click()
+		for _ in range(3):
+			print("Click: next")
+			self.browser.find(By.ID, Constant.NEXT_BUTTON).click()
 		
 		if video.privacy:
 			print(f"Click: visibility: '{video.privacy.upper()}'")
